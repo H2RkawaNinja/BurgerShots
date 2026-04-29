@@ -1,0 +1,317 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ===================================
+   BurgerShot - Admin Dashboard CSS
+   =================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-dark-900 text-white font-body;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { @apply bg-dark-800; }
+::-webkit-scrollbar-thumb { @apply bg-dark-500 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-burger-500; }
+
+::selection { @apply bg-burger-500 text-white; }
+
+/* ===================================
+   Core Components
+   =================================== */
+
+.burger-card {
+  @apply bg-dark-800 border border-dark-600 rounded-xl overflow-hidden;
+  @apply transition-all duration-300;
+  @apply hover:border-burger-500/50 hover:shadow-red;
+}
+
+.btn-burger {
+  @apply px-5 py-2.5 bg-burger-500 text-white font-semibold text-sm rounded-lg;
+  @apply border-2 border-burger-500;
+  @apply transition-all duration-200;
+  @apply hover:bg-burger-600 hover:border-burger-600;
+  @apply active:scale-95;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-burger-outline {
+  @apply px-5 py-2.5 bg-transparent text-burger-400 font-semibold text-sm rounded-lg;
+  @apply border-2 border-burger-500/60;
+  @apply transition-all duration-200;
+  @apply hover:bg-burger-500/10 hover:border-burger-500;
+  @apply active:scale-95;
+}
+
+.btn-amber {
+  @apply px-5 py-2.5 bg-amber-500 text-white font-semibold text-sm rounded-lg;
+  @apply transition-all duration-200;
+  @apply hover:bg-amber-600;
+  @apply active:scale-95;
+}
+
+.btn-navy {
+  @apply px-5 py-2.5 bg-navy-500 text-white font-semibold text-sm rounded-lg;
+  @apply transition-all duration-200;
+  @apply hover:bg-navy-600;
+  @apply active:scale-95;
+}
+
+.btn-ghost {
+  @apply px-5 py-2.5 bg-dark-700 text-dark-200 font-semibold text-sm rounded-lg;
+  @apply transition-all duration-200;
+  @apply hover:bg-dark-600 hover:text-white;
+  @apply active:scale-95;
+}
+
+@layer components {
+  .input-burger {
+    @apply w-full px-4 py-3 bg-dark-700 border border-dark-500 rounded-lg;
+    @apply text-white placeholder-dark-400 text-sm;
+    @apply focus:outline-none focus:border-burger-500 focus:ring-1 focus:ring-burger-500/40;
+    @apply transition-all duration-200;
+  }
+
+  .select-burger {
+    @apply w-full px-4 py-3 bg-dark-700 border border-dark-500 rounded-lg;
+    @apply text-white text-sm;
+    @apply focus:outline-none focus:border-burger-500 focus:ring-1 focus:ring-burger-500/40;
+    @apply transition-all duration-200;
+    @apply cursor-pointer;
+  }
+
+  .label-burger {
+    @apply block text-sm font-medium text-dark-200 mb-1.5;
+  }
+}
+
+/* Badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-available {
+  @apply bg-green-500/20 text-green-400 border border-green-500/30;
+}
+
+.badge-unavailable {
+  @apply bg-dark-500/40 text-dark-300 border border-dark-500/30;
+}
+
+.badge-open {
+  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+}
+
+.badge-preparing {
+  @apply bg-navy-500/30 text-blue-300 border border-navy-500/30;
+}
+
+.badge-ready {
+  @apply bg-green-500/20 text-green-400 border border-green-500/30;
+}
+
+.badge-picked-up {
+  @apply bg-dark-500/40 text-dark-300 border border-dark-500/30;
+}
+
+.badge-cancelled {
+  @apply bg-burger-500/20 text-burger-400 border border-burger-500/30;
+}
+
+.badge-active {
+  @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+}
+
+/* ===================================
+   Layout
+   =================================== */
+
+.container-main {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* ===================================
+   Admin Sidebar
+   =================================== */
+
+.sidebar {
+  @apply w-64 bg-dark-900 border-r border-dark-700 min-h-screen flex-shrink-0;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 text-dark-300 text-sm;
+  @apply transition-all duration-200 mx-2 rounded-lg;
+  @apply hover:bg-dark-700 hover:text-white;
+}
+
+.sidebar-link.active {
+  @apply bg-burger-500/15 text-burger-400 font-medium;
+  @apply border border-burger-500/30;
+}
+
+.sidebar-section {
+  @apply px-4 pt-5 pb-1 text-xs font-semibold uppercase tracking-widest text-dark-400;
+}
+
+/* ===================================
+   Data Table
+   =================================== */
+
+.data-table {
+  @apply w-full text-left text-sm;
+}
+
+.data-table th {
+  @apply px-4 py-3 bg-dark-800 text-dark-300 font-semibold text-xs uppercase tracking-wider;
+  @apply border-b border-dark-700;
+}
+
+.data-table td {
+  @apply px-4 py-3.5 border-b border-dark-800;
+}
+
+.data-table tr:hover td {
+  @apply bg-dark-800/60;
+}
+
+/* ===================================
+   Stats Cards
+   =================================== */
+
+.stats-card {
+  @apply p-5 bg-dark-800 border border-dark-700 rounded-xl;
+  @apply transition-all duration-200 hover:border-dark-600;
+}
+
+.stats-card .stat-value {
+  @apply text-3xl font-display text-white tracking-wide;
+}
+
+.stats-card .stat-label {
+  @apply text-xs text-dark-400 mt-1 uppercase tracking-wider;
+}
+
+.stats-card .stat-change-up {
+  @apply text-green-400 text-xs font-medium;
+}
+
+.stats-card .stat-change-down {
+  @apply text-burger-400 text-xs font-medium;
+}
+
+/* ===================================
+   Page Header
+   =================================== */
+
+.page-header {
+  @apply flex items-center justify-between mb-6;
+}
+
+.page-title {
+  @apply text-2xl font-display text-white tracking-wide;
+}
+
+.page-subtitle {
+  @apply text-sm text-dark-400 mt-0.5;
+}
+
+/* ===================================
+   Modal
+   =================================== */
+
+.modal-overlay {
+  @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+}
+
+.modal-box {
+  @apply bg-dark-800 border border-dark-600 rounded-2xl w-full max-w-lg shadow-card;
+  @apply animate-slide-up;
+}
+
+.modal-header {
+  @apply flex items-center justify-between p-5 border-b border-dark-700;
+}
+
+.modal-body {
+  @apply p-5;
+}
+
+.modal-footer {
+  @apply flex items-center justify-end gap-3 p-5 border-t border-dark-700;
+}
+
+/* ===================================
+   Alert / Toast
+   =================================== */
+
+.alert {
+  @apply flex items-start gap-3 px-4 py-3 rounded-lg text-sm mb-4;
+}
+
+.alert-error {
+  @apply bg-burger-500/15 border border-burger-500/30 text-burger-300;
+}
+
+.alert-success {
+  @apply bg-green-500/15 border border-green-500/30 text-green-300;
+}
+
+.alert-info {
+  @apply bg-navy-500/20 border border-navy-500/30 text-blue-300;
+}
+
+.alert-warning {
+  @apply bg-amber-500/15 border border-amber-500/30 text-amber-300;
+}
+
+/* ===================================
+   Public Pages
+   =================================== */
+
+.hero-section {
+  @apply relative min-h-screen flex items-center;
+  background: radial-gradient(ellipse at top, #1B3F8B22 0%, transparent 60%),
+              radial-gradient(ellipse at bottom right, #C8171E18 0%, transparent 50%),
+              #0f0f0f;
+}
+
+.menu-card {
+  @apply bg-dark-800 border border-dark-700 rounded-2xl overflow-hidden;
+  @apply transition-all duration-300;
+  @apply hover:border-amber-500/40 hover:shadow-amber hover:-translate-y-1;
+}
+
+.menu-card-img {
+  @apply w-full h-48 object-cover;
+}
+
+/* ===================================
+   Recharts dark theme overrides
+   =================================== */
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #242424;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #141414 !important;
+  border: 1px solid #333 !important;
+  border-radius: 8px !important;
+}
+
+.recharts-legend-item-text {
+  color: #808080 !important;
+}
