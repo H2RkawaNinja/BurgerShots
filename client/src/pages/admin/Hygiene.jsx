@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Plus, ClipboardCheck, CheckSquare, Square, Printer, Trash2, ChevronLeft, Settings, X, Check } from 'lucide-react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { Plus, ClipboardCheck, CheckSquare, Square, Printer, Trash2, ChevronLeft, Settings, X, Check, RotateCcw } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,7 +10,106 @@ const TYP_COLOR = { taeglich: 'badge-open', woechentlich: 'badge-preparing', mon
 
 const formatDatum = (d) => new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-const druckenAlsPDF = (pruefung) => {
+// ─── Unterschrifts-Modal ──────────────────────────────────────────────────────
+
+const SignaturModal = ({ pruefung, onClose }) => {
+  const canvasRef = useRef(null);
+  const drawing = useRef(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+
+  const getPos = (e, canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  };
+
+  const startDraw = (e) => {
+    drawing.current = true;
+    lastPos.current = getPos(e, canvasRef.current);
+  };
+  const draw = (e) => {
+    if (!drawing.current) return;
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getPos(e, canvas);
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(lastPos.current.x, lastPos.current.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    lastPos.current = pos;
+  };
+  const endDraw = () => { drawing.current = false; };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const isCanvasEmpty = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return true;
+    const ctx = canvas.getContext('2d');
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    return !data.some(v => v !== 0);
+  };
+
+  const handleDrucken = () => {
+    const sigDataUrl = isCanvasEmpty() ? null : canvasRef.current.toDataURL('image/png');
+    druckenAlsPDF(pruefung, sigDataUrl);
+    onClose();
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-box max-w-md">
+        <div className="modal-header">
+          <h2 className="font-display text-xl text-white tracking-wide">UNTERSCHRIFT</h2>
+          <button onClick={onClose} className="text-dark-400 hover:text-white"><X size={20} /></button>
+        </div>
+        <div className="modal-body">
+          <p className="text-dark-400 text-sm mb-3">Unterschrift des Mitarbeiters vor dem Druck (optional):</p>
+          <div className="border border-dark-600 bg-white rounded relative">
+            <canvas
+              ref={canvasRef}
+              width={420}
+              height={140}
+              className="w-full touch-none cursor-crosshair block"
+              onMouseDown={startDraw}
+              onMouseMove={draw}
+              onMouseUp={endDraw}
+              onMouseLeave={endDraw}
+              onTouchStart={startDraw}
+              onTouchMove={draw}
+              onTouchEnd={endDraw}
+            />
+            <button
+              onClick={clearCanvas}
+              className="absolute top-2 right-2 p-1 text-dark-400 hover:text-dark-800 transition-colors"
+              title="Löschen"
+            >
+              <RotateCcw size={14} />
+            </button>
+          </div>
+          <p className="text-dark-700 text-xs mt-2">Feld leer lassen wenn keine Unterschrift benötigt wird.</p>
+        </div>
+        <div className="modal-footer">
+          <button className="btn-ghost" onClick={onClose}>Abbrechen</button>
+          <button className="btn-burger flex items-center gap-2" onClick={handleDrucken}>
+            <Printer size={15} /> Drucken
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const druckenAlsPDF = (pruefung, signaturDataUrl = null) => {
   const bereiche = [...new Set(pruefung.eintraege.map(e => e.bereich))].sort();
   const win = window.open('', '_blank');
   const erledigtCount = pruefung.eintraege.filter(e => e.erledigt).length;
@@ -23,60 +122,65 @@ const druckenAlsPDF = (pruefung) => {
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', Arial, sans-serif; font-size: 10pt; color: #1a1a1a; background: #fff; }
-    .page { padding: 14mm 14mm 10mm; }
+    body { font-family: 'Inter', Arial, sans-serif; font-size: 9.5pt; color: #1a1a1a; background: #fff; }
+    .page { padding: 12mm 14mm 12mm; min-height: 297mm; display: flex; flex-direction: column; }
 
     /* Header */
-    .header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; margin-bottom: 0; }
-    .header img { height: 32px; object-fit: contain; }
+    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0; }
+    .header img { height: 28px; object-fit: contain; }
     .header-right { text-align: right; }
-    .header-right .doc-title { font-size: 7pt; letter-spacing: 0.15em; text-transform: uppercase; color: #999; }
-    .header-right .doc-date { font-size: 13pt; font-weight: 700; color: #111; margin-top: 1px; }
-    .divider-red { height: 3px; background: #C8171E; margin: 10px 0; }
+    .header-right .doc-label { font-size: 6.5pt; letter-spacing: 0.18em; text-transform: uppercase; color: #aaa; margin-bottom: 2px; }
+    .header-right .doc-date { font-size: 14pt; font-weight: 700; color: #111; line-height: 1; }
+    .header-right .doc-id { font-size: 7pt; color: #bbb; margin-top: 2px; letter-spacing: 0.08em; }
+    .accent-bar { height: 2px; background: linear-gradient(to right, #C8171E, #e84444 40%, #eee 100%); margin: 8px 0 12px; }
 
-    /* Meta bar */
-    .meta-bar { display: flex; gap: 0; margin-bottom: 14px; border: 1px solid #e5e7eb; }
-    .meta-cell { flex: 1; padding: 7px 12px; border-right: 1px solid #e5e7eb; }
+    /* Meta grid */
+    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #e5e7eb; margin-bottom: 14px; }
+    .meta-cell { padding: 7px 10px; border-right: 1px solid #e5e7eb; }
     .meta-cell:last-child { border-right: none; }
-    .meta-cell .label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 2px; }
-    .meta-cell .value { font-size: 9.5pt; font-weight: 600; color: #111; }
-
-    /* Status badge */
-    .status-ok { color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; display: inline-block; padding: 1px 8px; font-size: 8pt; font-weight: 700; letter-spacing: 0.05em; }
-    .status-offen { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; display: inline-block; padding: 1px 8px; font-size: 8pt; font-weight: 700; letter-spacing: 0.05em; }
+    .meta-cell .label { font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.12em; color: #b0b0b0; margin-bottom: 3px; }
+    .meta-cell .value { font-size: 9pt; font-weight: 600; color: #111; }
+    .status-ok  { color: #15803d; }
+    .status-nok { color: #b91c1c; }
 
     /* Section */
-    .section { margin-bottom: 14px; break-inside: avoid; }
-    .section-header { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 5px 10px; border-left: 3px solid #C8171E; margin-bottom: 0; }
-    .section-header span { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #374151; }
-    .section-header .count { font-size: 7.5pt; color: #9ca3af; margin-left: auto; }
+    .section { margin-bottom: 10px; page-break-inside: avoid; break-inside: avoid; border: 1px solid #e9ebee; }
+    .section-head { display: flex; align-items: center; background: #f5f6f8; padding: 5px 10px; border-bottom: 1px solid #e9ebee; }
+    .section-head .title { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #374151; }
+    .section-head .accent { display: inline-block; width: 3px; height: 12px; background: #C8171E; margin-right: 8px; flex-shrink: 0; }
+    .section-head .tally { margin-left: auto; font-size: 7pt; color: #9ca3af; font-weight: 600; }
 
-    /* Table */
-    table { width: 100%; border-collapse: collapse; }
-    tr:nth-child(even) td { background: #fafafa; }
-    td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; font-size: 9.5pt; vertical-align: middle; }
-    .check-col { width: 24px; text-align: center; }
-    .check-ok { color: #15803d; font-size: 13pt; font-weight: 700; line-height: 1; }
-    .check-nok { color: #dc2626; font-size: 13pt; font-weight: 700; line-height: 1; }
-    .item-name { color: #1a1a1a; }
-    .item-note { font-size: 8.5pt; color: #6b7280; font-style: italic; }
+    /* Rows */
+    .row { display: flex; align-items: flex-start; border-bottom: 1px solid #f3f4f6; padding: 5px 10px; gap: 10px; }
+    .row:last-child { border-bottom: none; }
+    .row:nth-child(even) { background: #fafbfc; }
+    .check-box { width: 16px; height: 16px; border: 1.5px solid #d1d5db; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10pt; font-weight: 700; }
+    .check-box.ok  { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+    .check-box.nok { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+    .row-text { flex: 1; font-size: 9pt; color: #1a1a1a; line-height: 1.4; }
+    .row-note { font-size: 7.5pt; color: #9ca3af; margin-top: 1px; font-style: italic; }
 
-    /* Summary */
-    .summary { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #e5e7eb; margin-top: 16px; background: #f9fafb; }
-    .summary-left { font-size: 9pt; color: #374151; }
-    .summary-left strong { font-size: 11pt; color: #111; }
-    .progress-bar { width: 160px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-top: 4px; }
-    .progress-fill { height: 100%; background: ${allOk ? '#16a34a' : '#C8171E'}; border-radius: 3px; width: ${total > 0 ? Math.round(erledigtCount / total * 100) : 0}%; }
-    .summary-pct { font-size: 18pt; font-weight: 700; color: ${allOk ? '#15803d' : '#C8171E'}; }
+    /* Result box */
+    .result-box { border: 1px solid #e5e7eb; display: flex; align-items: stretch; margin-top: 14px; margin-bottom: 14px; }
+    .result-main { flex: 1; padding: 10px 14px; border-right: 1px solid #e5e7eb; }
+    .result-label { font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.12em; color: #aaa; margin-bottom: 4px; }
+    .result-text { font-size: 9pt; color: #374151; }
+    .result-text strong { font-size: 11pt; color: #111; }
+    .result-bar { width: 140px; height: 5px; background: #e5e7eb; margin-top: 5px; }
+    .result-fill { height: 100%; background: ${allOk ? '#16a34a' : '#C8171E'}; width: ${total > 0 ? Math.round(erledigtCount / total * 100) : 0}%; }
+    .result-notiz { flex: 2; padding: 10px 14px; }
+    .result-pct { width: 72px; background: ${allOk ? '#f0fdf4' : '#fef2f2'}; display: flex; align-items: center; justify-content: center; font-size: 20pt; font-weight: 700; color: ${allOk ? '#15803d' : '#C8171E'}; }
 
-    /* Signature */
-    .sign { display: flex; gap: 16px; margin-top: 20px; }
-    .sign-box { flex: 1; padding-top: 36px; border-top: 1px solid #d1d5db; }
-    .sign-box .sign-label { font-size: 7.5pt; color: #9ca3af; letter-spacing: 0.05em; text-transform: uppercase; }
+    /* Signature row */
+    .sign-row { display: flex; gap: 12px; margin-top: auto; padding-top: 14px; }
+    .sign-box { flex: 1; border: 1px solid #e5e7eb; padding: 8px 10px; }
+    .sign-content { min-height: 52px; display: flex; align-items: flex-end; }
+    .sign-content img { max-height: 48px; max-width: 100%; object-fit: contain; }
+    .sign-label { font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.1em; color: #bbb; margin-top: 6px; padding-top: 5px; border-top: 1px solid #e9ebee; }
 
     /* Footer */
-    .footer { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid #f0f0f0; }
-    .footer span { font-size: 7pt; color: #d1d5db; letter-spacing: 0.05em; }
+    .doc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ebebeb; }
+    .doc-footer span { font-size: 6.5pt; color: #d1d5db; letter-spacing: 0.06em; text-transform: uppercase; }
 
     @page { margin: 0; size: A4; }
     @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
@@ -86,13 +190,14 @@ const druckenAlsPDF = (pruefung) => {
     <div class="header">
       <img src="${logoUrl}" alt="BurgerShot" />
       <div class="header-right">
-        <div class="doc-title">Hygiene-Prüfprotokoll</div>
+        <div class="doc-label">Hygiene-Prüfprotokoll</div>
         <div class="doc-date">${formatDatum(pruefung.datum)}</div>
+        <div class="doc-id">Protokoll-Nr. HP-${String(pruefung.id).padStart(4, '0')}</div>
       </div>
     </div>
-    <div class="divider-red"></div>
+    <div class="accent-bar"></div>
 
-    <div class="meta-bar">
+    <div class="meta-grid">
       <div class="meta-cell">
         <div class="label">Art der Prüfung</div>
         <div class="value">${TYP_LABEL[pruefung.typ] || pruefung.typ}</div>
@@ -103,50 +208,62 @@ const druckenAlsPDF = (pruefung) => {
       </div>
       <div class="meta-cell">
         <div class="label">Status</div>
-        <div class="value"><span class="${pruefung.abgeschlossen ? 'status-ok' : 'status-offen'}">${pruefung.abgeschlossen ? '✓ Abgeschlossen' : '○ Offen'}</span></div>
+        <div class="value ${pruefung.abgeschlossen ? 'status-ok' : 'status-nok'}">${pruefung.abgeschlossen ? '✓ Abgeschlossen' : '○ Offen'}</div>
       </div>
-      ${pruefung.abgeschlossen_am ? `<div class="meta-cell">
+      <div class="meta-cell">
         <div class="label">Abgeschlossen am</div>
-        <div class="value">${new Date(pruefung.abgeschlossen_am).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-      </div>` : ''}
+        <div class="value">${pruefung.abgeschlossen_am ? new Date(pruefung.abgeschlossen_am).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}</div>
+      </div>
     </div>
 
     ${bereiche.map(bereich => {
       const items = pruefung.eintraege.filter(e => e.bereich === bereich);
       const ok = items.filter(e => e.erledigt).length;
       return `<div class="section">
-        <div class="section-header">
-          <span>${bereich}</span>
-          <span class="count">${ok}/${items.length}</span>
+        <div class="section-head">
+          <span class="accent"></span>
+          <span class="title">${bereich}</span>
+          <span class="tally">${ok} / ${items.length}</span>
         </div>
-        <table>
-          <tbody>
-            ${items.map(e => `<tr>
-              <td class="check-col"><span class="${e.erledigt ? 'check-ok' : 'check-nok'}">${e.erledigt ? '✓' : '✗'}</span></td>
-              <td class="item-name">${e.bezeichnung}${e.bemerkung ? `<br><span class="item-note">${e.bemerkung}</span>` : ''}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
+        ${items.map(e => `<div class="row">
+          <div class="check-box ${e.erledigt ? 'ok' : 'nok'}">${e.erledigt ? '✓' : '✗'}</div>
+          <div class="row-text">${e.bezeichnung}${e.bemerkung ? `<div class="row-note">${e.bemerkung}</div>` : ''}</div>
+        </div>`).join('')}
       </div>`;
     }).join('')}
 
-    <div class="summary">
-      <div class="summary-left">
-        <div><strong>${erledigtCount} von ${total}</strong> Prüfpunkten erledigt</div>
-        <div class="progress-bar"><div class="progress-fill"></div></div>
-        ${pruefung.notiz ? `<div style="margin-top:6px;font-size:8.5pt;color:#6b7280"><strong>Notiz:</strong> ${pruefung.notiz}</div>` : ''}
+    <div class="result-box">
+      <div class="result-main">
+        <div class="result-label">Ergebnis</div>
+        <div class="result-text"><strong>${erledigtCount} / ${total}</strong> Prüfpunkten erledigt</div>
+        <div class="result-bar"><div class="result-fill"></div></div>
       </div>
-      <div class="summary-pct">${total > 0 ? Math.round(erledigtCount / total * 100) : 0}%</div>
+      <div class="result-notiz">
+        <div class="result-label">Notiz</div>
+        <div class="result-text">${pruefung.notiz || '<span style="color:#ccc">—</span>'}</div>
+      </div>
+      <div class="result-pct">${total > 0 ? Math.round(erledigtCount / total * 100) : 0}%</div>
     </div>
 
-    <div class="sign">
-      <div class="sign-box"><div class="sign-label">Unterschrift Mitarbeiter</div></div>
-      <div class="sign-box"><div class="sign-label">Unterschrift Betriebsleiter</div></div>
-      <div class="sign-box"><div class="sign-label">Datum / Stempel</div></div>
+    <div class="sign-row">
+      <div class="sign-box">
+        <div class="sign-content">
+          ${signaturDataUrl ? `<img src="${signaturDataUrl}" />` : ''}
+        </div>
+        <div class="sign-label">Unterschrift Mitarbeiter</div>
+      </div>
+      <div class="sign-box">
+        <div class="sign-content"></div>
+        <div class="sign-label">Unterschrift Betriebsleiter</div>
+      </div>
+      <div class="sign-box">
+        <div class="sign-content"></div>
+        <div class="sign-label">Datum / Stempel</div>
+      </div>
     </div>
 
-    <div class="footer">
-      <span>BURGERSHOT · HYGIENE-PRÜFPROTOKOLL</span>
+    <div class="doc-footer">
+      <span>BurgerShot &middot; Hygiene-Prüfprotokoll &middot; HP-${String(pruefung.id).padStart(4, '0')}</span>
       <span>Erstellt am ${new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
     </div>
 
@@ -180,6 +297,9 @@ const Hygiene = () => {
 
   // Lösch-Bestätigung
   const [deleteId, setDeleteId] = useState(null);
+
+  // Unterschrifts-Modal
+  const [signModal, setSignModal] = useState(false);
 
   const loadPruefungen = useCallback(async () => {
     setLoading(true);
@@ -323,7 +443,7 @@ const Hygiene = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => druckenAlsPDF(selected)} className="btn-ghost flex items-center gap-2">
+            <button onClick={() => setSignModal(true)} className="btn-ghost flex items-center gap-2">
               <Printer size={16} /> Als PDF drucken
             </button>
             {hasPermission('hygiene.verwalten') && !selected.abgeschlossen && (
@@ -430,6 +550,11 @@ const Hygiene = () => {
               <Trash2 size={14} /> Prüfung löschen
             </button>
           </div>
+        )}
+
+        {/* Unterschrifts-Modal */}
+        {signModal && (
+          <SignaturModal pruefung={selected} onClose={() => setSignModal(false)} />
         )}
 
         {/* Lösch-Dialog */}
