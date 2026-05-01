@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name burgershot.de www.burgershot.de;
+    server_name bstribe.com www.bstribe.com;
 
     root /var/www/burgershot/client/dist;
     index index.html;
