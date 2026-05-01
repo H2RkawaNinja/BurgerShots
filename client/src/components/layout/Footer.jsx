@@ -20,19 +20,7 @@ const Footer = () => (
             <Link to="/impressum" className="text-dark-600 hover:text-white transition-colors text-sm">Impressum</Link>
           </div>
         </div>
-        <div>
-          <h4 className="font-display tracking-widest text-xs text-dark-400 uppercase mb-4">Öffnungszeiten</h4>
-          <div className="text-sm space-y-1.5">
-            <div className="flex justify-between text-dark-600">
-              <span>Montag – Freitag</span>
-              <span className="text-dark-400">11:00 – 22:00</span>
-            </div>
-            <div className="flex justify-between text-dark-600">
-              <span>Samstag – Sonntag</span>
-              <span className="text-dark-400">12:00 – 23:00</span>
-            </div>
-          </div>
-        </div>
+
       </div>
       <div className="border-t border-dark-900 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
