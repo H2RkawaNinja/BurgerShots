@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShoppingBag, UtensilsCrossed, TrendingUp, Users, AlertCircle, Clock } from 'lucide-react';
+import { ShoppingBag, UtensilsCrossed, Users, AlertCircle, Clock } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -77,10 +77,8 @@ const Dashboard = () => {
       </div>
 
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard icon={ShoppingBag} label="Bestellungen heute" value={stats.bestellungenHeute} color="burger" />
-          <StatCard icon={TrendingUp} label="Umsatz heute" value={`${parseFloat(stats.umsatzHeute).toFixed(2)} €`} color="amber" />
-          <StatCard icon={TrendingUp} label="Umsatz Monat" value={`${parseFloat(stats.umsatzMonat).toFixed(2)} €`} color="green" />
           <StatCard icon={AlertCircle} label="Offene Bestellungen" value={stats.offeneBestellungen} color="burger" />
           <StatCard icon={UtensilsCrossed} label="Menü-Items" value={stats.menuItemsGesamt} color="navy" />
           <StatCard icon={Users} label="Team" value={stats.teamGesamt} color="navy" />
