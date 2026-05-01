@@ -19,11 +19,8 @@ import SpeisekarteVerwalten from './pages/admin/SpeisekarteVerwalten';
 import Kategorien from './pages/admin/Kategorien';
 import Bestellungen from './pages/admin/Bestellungen';
 import Tagesangebote from './pages/admin/Tagesangebote';
-import Lagerbestand from './pages/admin/Lagerbestand';
-import Statistiken from './pages/admin/Statistiken';
 import Mitarbeiter from './pages/admin/Mitarbeiter';
 import Rollen from './pages/admin/Rollen';
-import MeineStats from './pages/admin/MeineStats';
 import Aktivitaetslog from './pages/admin/Aktivitaetslog';
 import Hygiene from './pages/admin/Hygiene';
 
@@ -67,19 +64,9 @@ function App() {
                 <Tagesangebote />
               </ProtectedRoute>
             } />
-            <Route path="lagerbestand" element={
-              <ProtectedRoute permission="lagerbestand.ansehen">
-                <Lagerbestand />
-              </ProtectedRoute>
-            } />
             <Route path="hygiene" element={
               <ProtectedRoute permission="hygiene.ansehen">
                 <Hygiene />
-              </ProtectedRoute>
-            } />
-            <Route path="statistiken" element={
-              <ProtectedRoute permission="statistiken.ansehen">
-                <Statistiken />
               </ProtectedRoute>
             } />
             <Route path="mitarbeiter" element={
@@ -92,7 +79,6 @@ function App() {
                 <Rollen />
               </ProtectedRoute>
             } />
-            <Route path="meine-stats" element={<MeineStats />} />
             <Route path="log" element={
               <ProtectedRoute permission="log.ansehen">
                 <Aktivitaetslog />

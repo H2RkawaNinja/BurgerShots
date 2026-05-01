@@ -1,8 +1,8 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag, Star,
-  Package, BarChart3, Users, Shield, ScrollText,
-  LogOut, Menu, X, TrendingUp, ChefHat, ClipboardCheck
+  Users, Shield, ScrollText,
+  LogOut, Menu, X, ChefHat, ClipboardCheck
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -33,15 +33,7 @@ const AdminLayout = () => {
       items: [
         { to: '/admin/bestellungen', icon: ShoppingBag, label: 'Bestellungen', permission: 'bestellungen.ansehen' },
         { to: '/admin/tagesangebote', icon: Star, label: 'Tagesangebote', permission: 'tagesangebote.verwalten' },
-        { to: '/admin/lagerbestand', icon: Package, label: 'Lagerbestand', permission: 'lagerbestand.ansehen' },
         { to: '/admin/hygiene', icon: ClipboardCheck, label: 'Hygiene', permission: 'hygiene.ansehen' },
-      ]
-    },
-    {
-      label: 'Auswertung',
-      items: [
-        { to: '/admin/meine-stats', icon: TrendingUp, label: 'Meine Stats' },
-        { to: '/admin/statistiken', icon: BarChart3, label: 'Statistiken', permission: 'statistiken.ansehen' },
       ]
     },
     {
