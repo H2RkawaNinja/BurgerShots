@@ -15,66 +15,142 @@ const druckenAlsPDF = (pruefung) => {
   const win = window.open('', '_blank');
   const erledigtCount = pruefung.eintraege.filter(e => e.erledigt).length;
   const total = pruefung.eintraege.length;
+  const allOk = erledigtCount === total;
+  const logoUrl = window.location.origin + '/logo_wide.webp';
 
   win.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
   <title>Hygiene-Prüfprotokoll – ${formatDatum(pruefung.datum)}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 11pt; color: #111; padding: 20mm 15mm; }
-    h1 { font-size: 18pt; margin-bottom: 4px; }
-    .meta { font-size: 10pt; color: #555; margin-bottom: 16px; border-bottom: 2px solid #C8171E; padding-bottom: 10px; }
-    .meta span { margin-right: 20px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9pt; font-weight: bold; }
-    .badge-ok { background: #dcfce7; color: #166534; }
-    .badge-offen { background: #fef9c3; color: #854d0e; }
-    .bereich { margin-bottom: 16px; }
-    .bereich h2 { font-size: 12pt; font-weight: bold; background: #f3f4f6; padding: 5px 8px; border-left: 4px solid #C8171E; margin-bottom: 6px; }
+    body { font-family: 'Inter', Arial, sans-serif; font-size: 10pt; color: #1a1a1a; background: #fff; }
+    .page { padding: 14mm 14mm 10mm; }
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; margin-bottom: 0; }
+    .header img { height: 32px; object-fit: contain; }
+    .header-right { text-align: right; }
+    .header-right .doc-title { font-size: 7pt; letter-spacing: 0.15em; text-transform: uppercase; color: #999; }
+    .header-right .doc-date { font-size: 13pt; font-weight: 700; color: #111; margin-top: 1px; }
+    .divider-red { height: 3px; background: #C8171E; margin: 10px 0; }
+
+    /* Meta bar */
+    .meta-bar { display: flex; gap: 0; margin-bottom: 14px; border: 1px solid #e5e7eb; }
+    .meta-cell { flex: 1; padding: 7px 12px; border-right: 1px solid #e5e7eb; }
+    .meta-cell:last-child { border-right: none; }
+    .meta-cell .label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; margin-bottom: 2px; }
+    .meta-cell .value { font-size: 9.5pt; font-weight: 600; color: #111; }
+
+    /* Status badge */
+    .status-ok { color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; display: inline-block; padding: 1px 8px; font-size: 8pt; font-weight: 700; letter-spacing: 0.05em; }
+    .status-offen { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; display: inline-block; padding: 1px 8px; font-size: 8pt; font-weight: 700; letter-spacing: 0.05em; }
+
+    /* Section */
+    .section { margin-bottom: 14px; break-inside: avoid; }
+    .section-header { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 5px 10px; border-left: 3px solid #C8171E; margin-bottom: 0; }
+    .section-header span { font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #374151; }
+    .section-header .count { font-size: 7.5pt; color: #9ca3af; margin-left: auto; }
+
+    /* Table */
     table { width: 100%; border-collapse: collapse; }
-    th { background: #f9fafb; text-align: left; padding: 5px 8px; font-size: 9pt; border-bottom: 1px solid #ddd; }
-    td { padding: 5px 8px; border-bottom: 1px solid #eee; font-size: 10pt; vertical-align: top; }
-    .check-col { width: 28px; text-align: center; font-size: 14pt; }
-    .ok { color: #16a34a; }
-    .nok { color: #dc2626; }
-    .summary { margin-top: 20px; padding: 10px; background: #f9fafb; border: 1px solid #ddd; }
-    .sign { margin-top: 30px; display: flex; gap: 40px; }
-    .sign-box { flex: 1; border-top: 1px solid #333; padding-top: 4px; font-size: 9pt; color: #555; }
-    footer { margin-top: 20px; font-size: 8pt; color: #aaa; text-align: center; }
-    @page { margin: 15mm; }
+    tr:nth-child(even) td { background: #fafafa; }
+    td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; font-size: 9.5pt; vertical-align: middle; }
+    .check-col { width: 24px; text-align: center; }
+    .check-ok { color: #15803d; font-size: 13pt; font-weight: 700; line-height: 1; }
+    .check-nok { color: #dc2626; font-size: 13pt; font-weight: 700; line-height: 1; }
+    .item-name { color: #1a1a1a; }
+    .item-note { font-size: 8.5pt; color: #6b7280; font-style: italic; }
+
+    /* Summary */
+    .summary { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #e5e7eb; margin-top: 16px; background: #f9fafb; }
+    .summary-left { font-size: 9pt; color: #374151; }
+    .summary-left strong { font-size: 11pt; color: #111; }
+    .progress-bar { width: 160px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .progress-fill { height: 100%; background: ${allOk ? '#16a34a' : '#C8171E'}; border-radius: 3px; width: ${total > 0 ? Math.round(erledigtCount / total * 100) : 0}%; }
+    .summary-pct { font-size: 18pt; font-weight: 700; color: ${allOk ? '#15803d' : '#C8171E'}; }
+
+    /* Signature */
+    .sign { display: flex; gap: 16px; margin-top: 20px; }
+    .sign-box { flex: 1; padding-top: 36px; border-top: 1px solid #d1d5db; }
+    .sign-box .sign-label { font-size: 7.5pt; color: #9ca3af; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* Footer */
+    .footer { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+    .footer span { font-size: 7pt; color: #d1d5db; letter-spacing: 0.05em; }
+
+    @page { margin: 0; size: A4; }
+    @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   </style></head><body>
-  <h1>Hygiene-Prüfprotokoll</h1>
-  <div class="meta">
-    <span><strong>Datum:</strong> ${formatDatum(pruefung.datum)}</span>
-    <span><strong>Art:</strong> ${TYP_LABEL[pruefung.typ] || pruefung.typ}</span>
-    <span><strong>Durchgeführt von:</strong> ${pruefung.mitarbeiter ? pruefung.mitarbeiter.vorname + ' ' + pruefung.mitarbeiter.nachname : '—'}</span>
-    <span><strong>Status:</strong> <span class="badge ${pruefung.abgeschlossen ? 'badge-ok' : 'badge-offen'}">${pruefung.abgeschlossen ? 'Abgeschlossen' : 'Offen'}</span></span>
-    ${pruefung.abgeschlossen_am ? `<span><strong>Abgeschlossen am:</strong> ${new Date(pruefung.abgeschlossen_am).toLocaleString('de-DE')}</span>` : ''}
+  <div class="page">
+
+    <div class="header">
+      <img src="${logoUrl}" alt="BurgerShot" />
+      <div class="header-right">
+        <div class="doc-title">Hygiene-Prüfprotokoll</div>
+        <div class="doc-date">${formatDatum(pruefung.datum)}</div>
+      </div>
+    </div>
+    <div class="divider-red"></div>
+
+    <div class="meta-bar">
+      <div class="meta-cell">
+        <div class="label">Art der Prüfung</div>
+        <div class="value">${TYP_LABEL[pruefung.typ] || pruefung.typ}</div>
+      </div>
+      <div class="meta-cell">
+        <div class="label">Durchgeführt von</div>
+        <div class="value">${pruefung.mitarbeiter ? pruefung.mitarbeiter.vorname + ' ' + pruefung.mitarbeiter.nachname : '—'}</div>
+      </div>
+      <div class="meta-cell">
+        <div class="label">Status</div>
+        <div class="value"><span class="${pruefung.abgeschlossen ? 'status-ok' : 'status-offen'}">${pruefung.abgeschlossen ? '✓ Abgeschlossen' : '○ Offen'}</span></div>
+      </div>
+      ${pruefung.abgeschlossen_am ? `<div class="meta-cell">
+        <div class="label">Abgeschlossen am</div>
+        <div class="value">${new Date(pruefung.abgeschlossen_am).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+      </div>` : ''}
+    </div>
+
+    ${bereiche.map(bereich => {
+      const items = pruefung.eintraege.filter(e => e.bereich === bereich);
+      const ok = items.filter(e => e.erledigt).length;
+      return `<div class="section">
+        <div class="section-header">
+          <span>${bereich}</span>
+          <span class="count">${ok}/${items.length}</span>
+        </div>
+        <table>
+          <tbody>
+            ${items.map(e => `<tr>
+              <td class="check-col"><span class="${e.erledigt ? 'check-ok' : 'check-nok'}">${e.erledigt ? '✓' : '✗'}</span></td>
+              <td class="item-name">${e.bezeichnung}${e.bemerkung ? `<br><span class="item-note">${e.bemerkung}</span>` : ''}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    }).join('')}
+
+    <div class="summary">
+      <div class="summary-left">
+        <div><strong>${erledigtCount} von ${total}</strong> Prüfpunkten erledigt</div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        ${pruefung.notiz ? `<div style="margin-top:6px;font-size:8.5pt;color:#6b7280"><strong>Notiz:</strong> ${pruefung.notiz}</div>` : ''}
+      </div>
+      <div class="summary-pct">${total > 0 ? Math.round(erledigtCount / total * 100) : 0}%</div>
+    </div>
+
+    <div class="sign">
+      <div class="sign-box"><div class="sign-label">Unterschrift Mitarbeiter</div></div>
+      <div class="sign-box"><div class="sign-label">Unterschrift Betriebsleiter</div></div>
+      <div class="sign-box"><div class="sign-label">Datum / Stempel</div></div>
+    </div>
+
+    <div class="footer">
+      <span>BURGERSHOT · HYGIENE-PRÜFPROTOKOLL</span>
+      <span>Erstellt am ${new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+    </div>
+
   </div>
-  ${bereiche.map(bereich => {
-    const items = pruefung.eintraege.filter(e => e.bereich === bereich);
-    return `<div class="bereich">
-      <h2>${bereich}</h2>
-      <table>
-        <thead><tr><th class="check-col">✓</th><th>Prüfpunkt</th><th>Bemerkung</th></tr></thead>
-        <tbody>
-          ${items.map(e => `<tr>
-            <td class="check-col ${e.erledigt ? 'ok' : 'nok'}">${e.erledigt ? '✓' : '✗'}</td>
-            <td>${e.bezeichnung}</td>
-            <td style="color:#555">${e.bemerkung || ''}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
-  }).join('')}
-  <div class="summary">
-    <strong>Ergebnis:</strong> ${erledigtCount} von ${total} Prüfpunkten erledigt
-    ${pruefung.notiz ? `<br><strong>Notiz:</strong> ${pruefung.notiz}` : ''}
-  </div>
-  <div class="sign">
-    <div class="sign-box">Unterschrift Mitarbeiter</div>
-    <div class="sign-box">Unterschrift Betriebsleiter</div>
-    <div class="sign-box">Datum / Stempel</div>
-  </div>
-  <footer>BurgerShot · Hygiene-Prüfprotokoll · Erstellt am ${new Date().toLocaleString('de-DE')}</footer>
   </body></html>`);
   win.document.close();
   win.focus();
