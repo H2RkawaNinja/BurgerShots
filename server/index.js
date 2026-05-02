@@ -18,6 +18,7 @@ const rollenRoutes = require('./routes/rollen');
 const rechteRoutes = require('./routes/rechte');
 const logRoutes = require('./routes/log');
 const hygieneRoutes = require('./routes/hygiene');
+const menuesRoutes = require('./routes/menues');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,6 +46,7 @@ app.use('/api/rollen', rollenRoutes);
 app.use('/api/rechte', rechteRoutes);
 app.use('/api/log', logRoutes);
 app.use('/api/hygiene', hygieneRoutes);
+app.use('/api/menues', menuesRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'BurgerShot API läuft!' });

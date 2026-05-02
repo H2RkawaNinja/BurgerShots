@@ -1,8 +1,8 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag, Star,
   Users, Shield, ScrollText,
-  LogOut, Menu, X, ChefHat, ClipboardCheck
+  LogOut, Menu, X, ChefHat, ClipboardCheck, BookOpen, Globe
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -25,6 +25,7 @@ const AdminLayout = () => {
       label: 'Speisekarte',
       items: [
         { to: '/admin/speisekarte', icon: UtensilsCrossed, label: 'Menü-Items', permission: 'speisekarte.ansehen' },
+        { to: '/admin/menues', icon: BookOpen, label: 'Menüs', permission: 'speisekarte.ansehen' },
         { to: '/admin/kategorien', icon: ChefHat, label: 'Kategorien', permission: 'speisekarte.erstellen' },
       ]
     },
@@ -121,13 +122,20 @@ const AdminLayout = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-dark-700 bg-dark-900">
-          <button onClick={() => setSidebarOpen(true)} className="text-dark-300 hover:text-white">
+        {/* Top Bar */}
+        <header className="flex items-center justify-between px-4 py-3 border-b border-dark-700 bg-dark-900">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-dark-300 hover:text-white">
             <Menu size={22} />
           </button>
-          <img src="/logo_wide.webp" alt="BurgerShot" className="h-7 object-contain" />
-          <div className="w-6" />
+          <img src="/logo_wide.webp" alt="BurgerShot" className="h-7 object-contain lg:hidden" />
+          <div className="hidden lg:block" />
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xs tracking-widest uppercase font-semibold text-dark-400 hover:text-white border border-dark-700 hover:border-dark-500 px-3 py-1.5 rounded transition-colors"
+          >
+            <Globe size={14} />
+            Kundenbereich
+          </Link>
         </header>
 
         <main className="flex-1 p-6 overflow-auto">

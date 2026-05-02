@@ -16,6 +16,8 @@ const Einstellung = require('./Einstellung');
 const HygieneCheckpunkt = require('./HygieneCheckpunkt');
 const HygienePruefung = require('./HygienePruefung');
 const HygieneEintrag = require('./HygieneEintrag');
+const Menue = require('./Menue');
+const MenueItem = require('./MenueItem');
 
 // Rolle <-> Recht (Many-to-Many)
 Rolle.belongsToMany(Recht, { through: RolleRecht, foreignKey: 'rollen_id', otherKey: 'recht_id', as: 'rechte' });
@@ -61,6 +63,12 @@ Mitarbeiter.hasMany(HygienePruefung, { foreignKey: 'mitarbeiter_id', as: 'hygien
 HygienePruefung.hasMany(HygieneEintrag, { foreignKey: 'pruefung_id', as: 'eintraege' });
 HygieneEintrag.belongsTo(HygienePruefung, { foreignKey: 'pruefung_id', as: 'pruefung' });
 
+// Menue <-> MenuItem (durch MenueItem)
+Menue.hasMany(MenueItem, { foreignKey: 'menue_id', as: 'menue_items' });
+MenueItem.belongsTo(Menue, { foreignKey: 'menue_id', as: 'menue' });
+MenueItem.belongsTo(MenuItem, { foreignKey: 'menu_item_id', as: 'menu_item' });
+MenuItem.hasMany(MenueItem, { foreignKey: 'menu_item_id', as: 'menue_zuordnungen' });
+
 module.exports = {
   sequelize,
   Rolle,
@@ -78,5 +86,7 @@ module.exports = {
   Einstellung,
   HygieneCheckpunkt,
   HygienePruefung,
-  HygieneEintrag
+  HygieneEintrag,
+  Menue,
+  MenueItem
 };

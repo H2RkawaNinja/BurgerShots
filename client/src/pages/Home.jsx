@@ -12,7 +12,7 @@ const Home = () => {
 
   useEffect(() => {
     api.get('/menu?featured=true').then(r => setFeatured(r.data.slice(0, 3))).catch(() => {});
-    api.get('/tagesangebote').then(r => setAngebote(r.data.filter(a => a.aktiv).slice(0, 3))).catch(() => {});
+    api.get('/tagesangebote?aktiv=true').then(r => setAngebote(r.data.slice(0, 3))).catch(() => {});
   }, []);
 
   return (

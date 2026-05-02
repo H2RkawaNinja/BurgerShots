@@ -23,6 +23,7 @@ import Mitarbeiter from './pages/admin/Mitarbeiter';
 import Rollen from './pages/admin/Rollen';
 import Aktivitaetslog from './pages/admin/Aktivitaetslog';
 import Hygiene from './pages/admin/Hygiene';
+import Menues from './pages/admin/Menues';
 
 function App() {
   return (
@@ -52,6 +53,11 @@ function App() {
             <Route path="kategorien" element={
               <ProtectedRoute permission="speisekarte.erstellen">
                 <Kategorien />
+              </ProtectedRoute>
+            } />
+            <Route path="menues" element={
+              <ProtectedRoute permission="speisekarte.ansehen">
+                <Menues />
               </ProtectedRoute>
             } />
             <Route path="bestellungen" element={
