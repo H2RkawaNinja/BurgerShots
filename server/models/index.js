@@ -49,6 +49,7 @@ MenuItem.hasMany(BestellungItem, { foreignKey: 'menu_item_id', as: 'bestellung_i
 // Tagesangebot -> Mitarbeiter
 Tagesangebot.belongsTo(Mitarbeiter, { foreignKey: 'erstellt_von', as: 'ersteller' });
 Tagesangebot.belongsTo(MenuItem, { foreignKey: 'menu_item_id', as: 'menu_item' });
+Tagesangebot.belongsTo(Menue, { foreignKey: 'menue_id', as: 'menue' });
 
 // Lagerbestand -> Zutat
 Lagerbestand.belongsTo(Zutat, { foreignKey: 'zutat_id', as: 'zutat' });

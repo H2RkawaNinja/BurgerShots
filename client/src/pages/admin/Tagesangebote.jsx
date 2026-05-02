@@ -7,6 +7,7 @@ const Tagesangebote = () => {
   const { hasPermission } = useAuth();
   const [angebote, setAngebote] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
+  const [menues, setMenues] = useState([]);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
   const [imageFile, setImageFile] = useState(null);
@@ -14,20 +15,21 @@ const Tagesangebote = () => {
   const [error, setError] = useState('');
 
   const load = async () => {
-    const [angRes, menuRes] = await Promise.all([api.get('/tagesangebote'), api.get('/menu')]);
+    const [angRes, menuRes, menuesRes] = await Promise.all([api.get('/tagesangebote'), api.get('/menu'), api.get('/menues')]);
     setAngebote(angRes.data);
     setMenuItems(menuRes.data);
+    setMenues(menuesRes.data);
   };
   useEffect(() => { load(); }, []);
 
   const today = new Date().toISOString().split('T')[0];
 
   const openCreate = () => {
-    setForm({ name: '', beschreibung: '', rabatt_prozent: '', sonderpreis: '', menu_item_id: '', gueltig_von: today, gueltig_bis: today, aktiv: true });
+    setForm({ name: '', beschreibung: '', rabatt_prozent: '', sonderpreis: '', verknuepfung_typ: 'item', menu_item_id: '', menue_id: '', gueltig_von: today, gueltig_bis: today, aktiv: true });
     setImageFile(null); setError(''); setModal({ mode: 'create' });
   };
 
-  const openEdit = (a) => { setForm({ ...a }); setImageFile(null); setError(''); setModal({ mode: 'edit', item: a }); };
+  const openEdit = (a) => { setForm({ ...a, verknuepfung_typ: a.menue_id ? 'menue' : 'item' }); setImageFile(null); setError(''); setModal({ mode: 'edit', item: a }); };
 
   const handleSave = async () => {
     setSaving(true); setError('');
@@ -131,11 +133,35 @@ const Tagesangebote = () => {
                 <div><label className="label-burger">Rabatt (%)</label><input type="number" className="input-burger" value={form.rabatt_prozent || ''} onChange={e => setForm(f => ({ ...f, rabatt_prozent: e.target.value }))} /></div>
                 <div><label className="label-burger">Sonderpreis ($)</label><input type="number" step="0.01" className="input-burger" value={form.sonderpreis || ''} onChange={e => setForm(f => ({ ...f, sonderpreis: e.target.value }))} /></div>
               </div>
-              <div><label className="label-burger">Verknüpftes Menü-Item</label>
-                <select className="select-burger" value={form.menu_item_id || ''} onChange={e => setForm(f => ({ ...f, menu_item_id: e.target.value }))}>
-                  <option value="">— keines —</option>
-                  {menuItems.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                </select>
+              <div>
+                <label className="label-burger">Verknüpfung</label>
+                <div className="flex gap-2 mb-2">
+                  <button type="button"
+                    onClick={() => setForm(f => ({ ...f, verknuepfung_typ: 'item', menue_id: '' }))}
+                    className={`flex-1 py-1.5 text-xs font-semibold tracking-wider uppercase border transition-colors ${
+                      form.verknuepfung_typ !== 'menue' ? 'bg-burger-500 border-burger-500 text-white' : 'border-dark-600 text-dark-400 hover:border-dark-500'
+                    }`}>
+                    Menü-Item
+                  </button>
+                  <button type="button"
+                    onClick={() => setForm(f => ({ ...f, verknuepfung_typ: 'menue', menu_item_id: '' }))}
+                    className={`flex-1 py-1.5 text-xs font-semibold tracking-wider uppercase border transition-colors ${
+                      form.verknuepfung_typ === 'menue' ? 'bg-burger-500 border-burger-500 text-white' : 'border-dark-600 text-dark-400 hover:border-dark-500'
+                    }`}>
+                    Menü
+                  </button>
+                </div>
+                {form.verknuepfung_typ === 'menue' ? (
+                  <select className="select-burger" value={form.menue_id || ''} onChange={e => setForm(f => ({ ...f, menue_id: e.target.value, menu_item_id: '' }))}>
+                    <option value="">— keines —</option>
+                    {menues.map(m => <option key={m.id} value={m.id}>🍽️ {m.name}</option>)}
+                  </select>
+                ) : (
+                  <select className="select-burger" value={form.menu_item_id || ''} onChange={e => setForm(f => ({ ...f, menu_item_id: e.target.value, menue_id: '' }))}>
+                    <option value="">— keines —</option>
+                    {menuItems.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  </select>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="label-burger">Gültig von</label><input type="date" className="input-burger" value={form.gueltig_von?.split('T')[0] || ''} onChange={e => setForm(f => ({ ...f, gueltig_von: e.target.value }))} /></div>

@@ -9,6 +9,7 @@ const Tagesangebot = sequelize.define('Tagesangebot', {
   rabatt_prozent: { type: DataTypes.INTEGER, defaultValue: 0 },
   sonderpreis: { type: DataTypes.DECIMAL(8, 2), allowNull: true },
   menu_item_id: { type: DataTypes.INTEGER, allowNull: true },
+  menue_id: { type: DataTypes.INTEGER, allowNull: true },
   gueltig_von: { type: DataTypes.DATEONLY, allowNull: true },
   gueltig_bis: { type: DataTypes.DATEONLY, allowNull: true },
   aktiv: { type: DataTypes.BOOLEAN, defaultValue: true },

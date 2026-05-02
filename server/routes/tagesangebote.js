@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { Tagesangebot, MenuItem } = require('../models');
+const { Tagesangebot, MenuItem, Menue } = require('../models');
 const { authenticate, requirePermission } = require('../middleware/auth');
 const { logAktion } = require('../utils/logger');
 
@@ -24,7 +24,10 @@ router.get('/', async (req, res) => {
     if (req.query.aktiv === 'true') where.aktiv = true;
     const angebote = await Tagesangebot.findAll({
       where,
-      include: [{ model: MenuItem, as: 'menu_item', attributes: ['id', 'name', 'preis'] }],
+      include: [
+        { model: MenuItem, as: 'menu_item', attributes: ['id', 'name', 'preis'] },
+        { model: Menue, as: 'menue', attributes: ['id', 'name', 'preis'] }
+      ],
       order: [['erstellt_am', 'DESC']]
     });
     res.json(angebote);
@@ -36,6 +39,10 @@ router.get('/', async (req, res) => {
 router.post('/', authenticate, requirePermission('tagesangebote.verwalten'), upload.single('bild'), async (req, res) => {
   try {
     const data = { ...req.body, erstellt_von: req.mitarbeiter.id };
+    if (data.menu_item_id === '' || data.menu_item_id === undefined) data.menu_item_id = null;
+    if (data.menue_id === '' || data.menue_id === undefined) data.menue_id = null;
+    if (data.rabatt_prozent === '') data.rabatt_prozent = null;
+    if (data.sonderpreis === '') data.sonderpreis = null;
     if (req.file) data.bild = `/uploads/angebote/${req.file.filename}`;
     const angebot = await Tagesangebot.create(data);
     logAktion(`Tagesangebot erstellt: ${angebot.name}`, 'Tagesangebote', req.mitarbeiter, { angebot_id: angebot.id });
@@ -50,6 +57,10 @@ router.put('/:id', authenticate, requirePermission('tagesangebote.verwalten'), u
     const a = await Tagesangebot.findByPk(req.params.id);
     if (!a) return res.status(404).json({ error: 'Nicht gefunden.' });
     const data = { ...req.body };
+    if (data.menu_item_id === '' || data.menu_item_id === undefined) data.menu_item_id = null;
+    if (data.menue_id === '' || data.menue_id === undefined) data.menue_id = null;
+    if (data.rabatt_prozent === '') data.rabatt_prozent = null;
+    if (data.sonderpreis === '') data.sonderpreis = null;
     if (req.file) data.bild = `/uploads/angebote/${req.file.filename}`;
     await a.update(data);
     res.json(a);
