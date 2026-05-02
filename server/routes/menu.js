@@ -64,10 +64,24 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Hilfsfunktion: Leere Strings für Integer-Felder in null umwandeln
+const parseMenuData = (body) => {
+  const intFields = ['kalorien', 'kategorie_id'];
+  const data = { ...body };
+  for (const field of intFields) {
+    if (data[field] === '' || data[field] === undefined) {
+      data[field] = null;
+    } else if (data[field] !== null) {
+      data[field] = Number(data[field]) || null;
+    }
+  }
+  return data;
+};
+
 // POST /api/menu
 router.post('/', authenticate, requirePermission('speisekarte.erstellen'), upload.single('bild'), async (req, res) => {
   try {
-    const data = { ...req.body, erstellt_von: req.mitarbeiter.id };
+    const data = { ...parseMenuData(req.body), erstellt_von: req.mitarbeiter.id };
     if (req.file) data.bild = `/uploads/menu/${req.file.filename}`;
     const item = await MenuItem.create(data);
     logAktion(`Menü-Item erstellt: ${item.name}`, 'Speisekarte', req.mitarbeiter, { item_id: item.id });
@@ -84,7 +98,7 @@ router.put('/:id', authenticate, requirePermission('speisekarte.bearbeiten'), up
     const item = await MenuItem.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'Nicht gefunden.' });
 
-    const data = { ...req.body, aktualisiert_von: req.mitarbeiter.id };
+    const data = { ...parseMenuData(req.body), aktualisiert_von: req.mitarbeiter.id };
     if (req.file) data.bild = `/uploads/menu/${req.file.filename}`;
     await item.update(data);
     logAktion(`Menü-Item aktualisiert: ${item.name}`, 'Speisekarte', req.mitarbeiter, { item_id: item.id });
