@@ -62,7 +62,7 @@ const MeineStats = () => {
                   <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center"><TrendingUp size={18} className="text-amber-400" /></div>
                   <div>
                     <div className="stat-label">Umsatz gesamt</div>
-                    <div className="stat-value">{parseFloat(stats.umsatz_gesamt || 0).toFixed(2)} €</div>
+                    <div className="stat-value">${parseFloat(stats.umsatz_gesamt || 0).toFixed(2)}</div>
                   </div>
                 </div>
               </div>
@@ -71,7 +71,7 @@ const MeineStats = () => {
                   <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center"><Clock size={18} className="text-blue-400" /></div>
                   <div>
                     <div className="stat-label">Ø Bestellwert</div>
-                    <div className="stat-value">{parseFloat(stats.avg_bestellwert || 0).toFixed(2)} €</div>
+                    <div className="stat-value">${parseFloat(stats.avg_bestellwert || 0).toFixed(2)}</div>
                   </div>
                 </div>
               </div>

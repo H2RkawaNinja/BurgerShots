@@ -167,7 +167,7 @@ const Menues = () => {
                       {(menue.menue_items || []).length === 0 && <span className="text-dark-500 text-xs">—</span>}
                     </div>
                   </td>
-                  <td className="text-amber-400 font-semibold">{parseFloat(menue.preis).toFixed(2)} €</td>
+                  <td className="text-amber-400 font-semibold">${parseFloat(menue.preis).toFixed(2)}</td>
                   <td>
                     <span className={`badge ${menue.verfuegbar ? 'badge-available' : 'badge-unavailable'}`}>
                       {menue.verfuegbar ? '✓ Verfügbar' : '✗ Nicht verfügbar'}
@@ -216,7 +216,7 @@ const Menues = () => {
                   <input className="input-burger" value={form.name || ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="label-burger">Preis (€) *</label>
+                  <label className="label-burger">Preis ($) *</label>
                   <input type="number" step="0.01" className="input-burger" value={form.preis || ''} onChange={e => setForm(f => ({ ...f, preis: e.target.value }))} />
                 </div>
                 <div>
@@ -244,7 +244,7 @@ const Menues = () => {
                       <div key={s.menu_item_id} className="flex items-center gap-3 bg-dark-700 rounded-lg px-3 py-2">
                         <span className="flex-1 text-sm text-white">{s._item?.name || '?'}</span>
                         <span className="text-xs text-dark-400 w-14 text-right">
-                          {s._item?.preis ? `${parseFloat(s._item.preis).toFixed(2)} €` : ''}
+                          {s._item?.preis ? `$${parseFloat(s._item.preis).toFixed(2)}` : ''}
                         </span>
                         <input
                           type="number"
@@ -288,7 +288,7 @@ const Menues = () => {
                             : <div className="w-8 h-8 bg-dark-700 rounded flex items-center justify-center text-sm">{item.kategorie?.icon || '🍔'}</div>
                           }
                           <span className="flex-1 text-sm text-white">{item.name}</span>
-                          <span className="text-xs text-amber-400">{parseFloat(item.preis).toFixed(2)} €</span>
+                          <span className="text-xs text-amber-400">${parseFloat(item.preis).toFixed(2)}</span>
                           <Plus size={14} className="text-dark-400" />
                         </button>
                       ))

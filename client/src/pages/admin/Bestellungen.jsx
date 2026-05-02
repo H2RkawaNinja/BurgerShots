@@ -138,7 +138,7 @@ const Bestellungen = () => {
                   <tr key={b.id}>
                     <td className="font-mono text-sm text-dark-200">{b.bestellnummer}</td>
                     <td><span className={`badge ${sc.cls}`}>{sc.label}</span></td>
-                    <td className="text-amber-400 font-semibold">{parseFloat(b.gesamtbetrag).toFixed(2)} €</td>
+                    <td className="text-amber-400 font-semibold">${parseFloat(b.gesamtbetrag).toFixed(2)}</td>
                     <td className="text-dark-300 text-sm">{b.items?.length || 0} Pos.</td>
                     <td className="text-dark-300">{b.tisch_nr || '—'}</td>
                     <td className="text-dark-400 text-xs">{new Date(b.erstellt_am).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
@@ -189,7 +189,7 @@ const Bestellungen = () => {
                   <button key={item.id} onClick={() => addItem(item)}
                     className="text-left p-3 bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors">
                     <div className="text-white text-sm font-medium">{item.name}</div>
-                    <div className="text-amber-400 text-xs">{parseFloat(item.preis).toFixed(2)} €</div>
+                    <div className="text-amber-400 text-xs">${parseFloat(item.preis).toFixed(2)}</div>
                   </button>
                 ))}
               </div>
@@ -204,13 +204,13 @@ const Bestellungen = () => {
                         <button onClick={() => updateMenge(item.menu_item_id, item.menge - 1)} className="w-6 h-6 bg-dark-600 rounded text-white hover:bg-burger-500 transition-colors">−</button>
                         <span className="text-white text-sm w-5 text-center">{item.menge}</span>
                         <button onClick={() => updateMenge(item.menu_item_id, item.menge + 1)} className="w-6 h-6 bg-dark-600 rounded text-white hover:bg-green-600 transition-colors">+</button>
-                        <span className="text-amber-400 text-sm w-16 text-right">{(parseFloat(item.preis) * item.menge).toFixed(2)} €</span>
+                        <span className="text-amber-400 text-sm w-16 text-right">${(parseFloat(item.preis) * item.menge).toFixed(2)}</span>
                       </div>
                     </div>
                   ))}
                   <div className="flex justify-between pt-2 font-semibold">
                     <span className="text-dark-300">Gesamt</span>
-                    <span className="text-amber-400">{total.toFixed(2)} €</span>
+                    <span className="text-amber-400">${total.toFixed(2)}</span>
                   </div>
                 </div>
               )}
@@ -218,7 +218,7 @@ const Bestellungen = () => {
             <div className="modal-footer">
               <button className="btn-ghost" onClick={() => setModal(null)}>Abbrechen</button>
               <button className="btn-burger" onClick={handleCreateSubmit} disabled={saving}>
-                {saving ? 'Erstellen...' : `Bestellung erstellen (${total.toFixed(2)} €)`}
+                {saving ? 'Erstellen...' : `Bestellung erstellen ($${total.toFixed(2)})`}
               </button>
             </div>
           </div>

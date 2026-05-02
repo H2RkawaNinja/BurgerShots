@@ -109,7 +109,7 @@ const Dashboard = () => {
                     <tr key={b.id}>
                       <td className="font-mono text-sm text-dark-200">{b.bestellnummer}</td>
                       <td><span className={`badge ${st.cls}`}>{st.label}</span></td>
-                      <td className="text-amber-400 font-semibold">{parseFloat(b.gesamtbetrag).toFixed(2)} €</td>
+                      <td className="text-amber-400 font-semibold">${parseFloat(b.gesamtbetrag).toFixed(2)}</td>
                       <td className="text-dark-300">{b.tisch_nr || '—'}</td>
                       <td className="text-dark-400 text-xs">
                         {new Date(b.erstellt_am).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}

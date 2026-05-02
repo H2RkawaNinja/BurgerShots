@@ -143,7 +143,7 @@ const SpeisekarteVerwalten = () => {
                     </div>
                   </td>
                   <td className="text-dark-300">{item.kategorie?.icon} {item.kategorie?.name || '—'}</td>
-                  <td className="text-amber-400 font-semibold">{parseFloat(item.preis).toFixed(2)} €</td>
+                  <td className="text-amber-400 font-semibold">${parseFloat(item.preis).toFixed(2)}</td>
                   <td className="text-dark-400">{item.kalorien ? `${item.kalorien} kcal` : '—'}</td>
                   <td>
                     <button onClick={() => toggleVerfuegbar(item)} className={`badge cursor-pointer ${item.verfuegbar ? 'badge-available' : 'badge-unavailable'}`}>
@@ -199,7 +199,7 @@ const SpeisekarteVerwalten = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="label-burger">Preis (€) *</label>
+                  <label className="label-burger">Preis ($) *</label>
                   <input type="number" step="0.01" className="input-burger" value={form.preis || ''} onChange={e => setForm(f => ({ ...f, preis: e.target.value }))} />
                 </div>
                 <div>

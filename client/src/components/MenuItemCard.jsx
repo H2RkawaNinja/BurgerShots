@@ -32,7 +32,7 @@ const MenuItemCard = ({ item }) => (
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <h3 className="font-medium text-white text-sm leading-snug">{item.name}</h3>
         <span className="font-display text-xl text-amber-400 shrink-0 leading-none tabular-nums">
-          {parseFloat(item.preis).toFixed(2)} €
+          ${parseFloat(item.preis).toFixed(2)}
         </span>
       </div>
       {item.beschreibung && (

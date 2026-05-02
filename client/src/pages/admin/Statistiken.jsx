@@ -67,8 +67,8 @@ const Statistiken = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
                   <XAxis dataKey="datum" tick={{ fill: '#6b7280', fontSize: 11 }} />
-                  <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `${v}€`} />
-                  <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: 8 }} labelStyle={{ color: '#fff' }} formatter={v => [`${parseFloat(v).toFixed(2)}€`, 'Umsatz']} />
+                  <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `$${v}`} />
+                  <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: 8 }} labelStyle={{ color: '#fff' }} formatter={v => [`$${parseFloat(v).toFixed(2)}`, 'Umsatz']} />
                   <Area type="monotone" dataKey="umsatz" stroke="#C8171E" fill="url(#umsatzGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -101,7 +101,7 @@ const Statistiken = () => {
                     <Pie data={kategorien} dataKey="umsatz" nameKey="kategorie" cx="50%" cy="50%" outerRadius={90} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                       {kategorien.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
-                    <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: 8 }} formatter={v => [`${parseFloat(v).toFixed(2)}€`, 'Umsatz']} />
+                    <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: 8 }} formatter={v => [`$${parseFloat(v).toFixed(2)}`, 'Umsatz']} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -123,8 +123,8 @@ const Statistiken = () => {
                     <tr key={m.id}>
                       <td className="font-medium text-white">{m.vorname} {m.nachname}</td>
                       <td className="text-dark-300">{m.bestellungen_gesamt}</td>
-                      <td className="text-amber-400 font-semibold">{parseFloat(m.umsatz_gesamt || 0).toFixed(2)} €</td>
-                      <td className="text-dark-400">{parseFloat(m.avg_bestellwert || 0).toFixed(2)} €</td>
+                      <td className="text-amber-400 font-semibold">${parseFloat(m.umsatz_gesamt || 0).toFixed(2)}</td>
+                      <td className="text-dark-400">${parseFloat(m.avg_bestellwert || 0).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>

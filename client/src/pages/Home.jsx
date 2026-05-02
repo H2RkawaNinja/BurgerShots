@@ -86,7 +86,7 @@ const Home = () => {
                 </div>
                 <div className="shrink-0 text-right">
                   {a.sonderpreis && (
-                    <div className="font-display text-2xl text-amber-400 leading-none">{parseFloat(a.sonderpreis).toFixed(2)} €</div>
+                    <div className="font-display text-2xl text-amber-400 leading-none">${parseFloat(a.sonderpreis).toFixed(2)}</div>
                   )}
                   {a.rabatt_prozent && (
                     <div className="text-xs text-burger-500 font-bold tracking-wider mt-1">–{a.rabatt_prozent}% RABATT</div>

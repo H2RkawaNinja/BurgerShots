@@ -92,7 +92,7 @@ const Tagesangebote = () => {
                   <span className="px-2 py-0.5 bg-burger-500/20 text-burger-400 text-xs font-bold rounded-full">-{a.rabatt_prozent}%</span>
                 )}
                 {a.sonderpreis && (
-                  <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full">{parseFloat(a.sonderpreis).toFixed(2)} €</span>
+                  <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full">${parseFloat(a.sonderpreis).toFixed(2)}</span>
                 )}
               </div>
 
@@ -129,7 +129,7 @@ const Tagesangebote = () => {
               <div><label className="label-burger">Beschreibung</label><textarea className="input-burger h-16 resize-none" value={form.beschreibung || ''} onChange={e => setForm(f => ({ ...f, beschreibung: e.target.value }))} /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="label-burger">Rabatt (%)</label><input type="number" className="input-burger" value={form.rabatt_prozent || ''} onChange={e => setForm(f => ({ ...f, rabatt_prozent: e.target.value }))} /></div>
-                <div><label className="label-burger">Sonderpreis (€)</label><input type="number" step="0.01" className="input-burger" value={form.sonderpreis || ''} onChange={e => setForm(f => ({ ...f, sonderpreis: e.target.value }))} /></div>
+                <div><label className="label-burger">Sonderpreis ($)</label><input type="number" step="0.01" className="input-burger" value={form.sonderpreis || ''} onChange={e => setForm(f => ({ ...f, sonderpreis: e.target.value }))} /></div>
               </div>
               <div><label className="label-burger">Verknüpftes Menü-Item</label>
                 <select className="select-burger" value={form.menu_item_id || ''} onChange={e => setForm(f => ({ ...f, menu_item_id: e.target.value }))}>
